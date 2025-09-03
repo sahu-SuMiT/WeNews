@@ -10,6 +10,7 @@ class User {
     this.firstName = data.firstName || '';
     this.lastName = data.lastName || '';
     this.profilePicture = data.profilePicture || null;
+    this.role = data.role || 'user'; // Default role is 'user', can be 'admin' or 'user'
     this.preferences = data.preferences || {
       categories: [],
       language: 'en',
@@ -48,6 +49,7 @@ class User {
         firstName: userData.firstName,
         lastName: userData.lastName,
         profilePicture: userData.profilePicture || null,
+        role: userData.role || 'user', // Default to 'user' role
         preferences: {
           categories: userData.preferences?.categories || [],
           language: userData.preferences?.language || 'en',

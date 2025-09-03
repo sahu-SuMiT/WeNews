@@ -13,6 +13,8 @@ const walletRoutes = require('./routes/wallet');
 const earningsRoutes = require('./routes/earnings');
 const labelsRoutes = require('./routes/labels');
 const dashboardRoutes = require('./routes/dashboard');
+const adminRoutes = require('./routes/admin');
+const notificationRoutes = require('./routes/notifications');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -36,6 +38,8 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/earnings', earningsRoutes);
 app.use('/api/labels', labelsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -29,6 +29,8 @@ const auth = async (req, res, next) => {
       });
     }
 
+    // Add role from JWT token to user object
+    user.role = decoded.role || user.role;
     req.user = user;
     next();
   } catch (error) {
@@ -63,6 +65,8 @@ const optionalAuth = async (req, res, next) => {
       const user = await User.findById(decoded.userId).select('-password');
       
       if (user && user.isActive) {
+        // Add role from JWT token to user object
+        user.role = decoded.role || user.role;
         req.user = user;
       }
     }
