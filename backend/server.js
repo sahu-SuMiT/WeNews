@@ -15,6 +15,7 @@ const labelsRoutes = require('./routes/labels');
 const dashboardRoutes = require('./routes/dashboard');
 const adminRoutes = require('./routes/admin');
 const notificationRoutes = require('./routes/notifications');
+const investmentRoutes = require('./routes/investment');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -40,6 +41,7 @@ app.use('/api/labels', labelsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/investment', investmentRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
