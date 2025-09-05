@@ -1,20 +1,44 @@
 const express = require('express');
 const router = express.Router();
 const { body, query, validationResult } = require('express-validator');
-const auth = require('../middleware/auth');
-const adminAuth = require('../middleware/auth').adminAuth;
+const { auth, adminAuth } = require('../middleware/auth');
 const NotificationController = require('../controllers/notificationController');
 
 // @route   GET /api/notifications
 // @desc    Get user notifications
 // @access  Private
-router.get('/', [
-  auth,
-  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
-  query('type').optional().isIn(['earnings', 'reward', 'news', 'withdrawal', 'system']).withMessage('Invalid notification type'),
-  query('isRead').optional().isBoolean().withMessage('isRead must be a boolean')
-], NotificationController.getUserNotifications);
+router.get('/', auth, async (req, res) => {
+  try {
+    // Basic validation
+    const { page = 1, limit = 20, type, isRead } = req.query;
+    
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    
+    if (pageNum < 1 || limitNum < 1 || limitNum > 100) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid pagination parameters'
+      });
+    }
+    
+    if (type && !['earnings', 'reward', 'news', 'withdrawal', 'system'].includes(type)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid notification type'
+      });
+    }
+    
+    // Call the controller
+    await NotificationController.getUserNotifications(req, res);
+  } catch (error) {
+    console.error('Error in notifications route:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
 
 // @route   GET /api/notifications/unread-count
 // @desc    Get unread notifications count
@@ -39,14 +63,35 @@ router.delete('/:notificationId', auth, NotificationController.deleteNotificatio
 // @route   POST /api/notifications
 // @desc    Create notification (for testing/admin use)
 // @access  Private
-router.post('/', [
-  auth,
-  body('userId').notEmpty().withMessage('User ID is required'),
-  body('type').isIn(['earnings', 'reward', 'news', 'withdrawal', 'system']).withMessage('Invalid notification type'),
-  body('title').notEmpty().withMessage('Title is required'),
-  body('message').notEmpty().withMessage('Message is required'),
-  body('data').optional().isObject().withMessage('Data must be an object')
-], NotificationController.createNotification);
+router.post('/', auth, async (req, res) => {
+  try {
+    // Basic validation
+    const { userId, type, title, message, data } = req.body;
+    
+    if (!userId || !type || !title || !message) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: userId, type, title, message'
+      });
+    }
+    
+    if (!['earnings', 'reward', 'news', 'withdrawal', 'system'].includes(type)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid notification type'
+      });
+    }
+    
+    // Call the controller
+    await NotificationController.createNotification(req, res);
+  } catch (error) {
+    console.error('Error in create notification route:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
 
 // @route   GET /api/notifications/stats
 // @desc    Get notification statistics (admin only)
